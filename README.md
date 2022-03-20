@@ -14,6 +14,6 @@ Esimerkkejä tietokannan tauluista:
 - Pelaajan saavutukset eri peleissä.
 
 
-Hieman vastaava applikaatio on: https://faceitfinder.com/
+Hieman vastaava applikaatio on: https://faceitfinder.com/ voit esimerkiksi syöttää tämän steamidn: 76561197991348083
 
 Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
