@@ -1,7 +1,6 @@
 # Tsoha harjoitustyö kevät 2022
 
-Projektia käytetään steam käyttäjien tutkimiseen. Steam on maailman isoin pelien jakelualusta.  
-Erityisesti projektissa tarkastellaan miten luotettava pelaaja on. Tämä tehdään keräämällä tietoa 
+Projektia käytetään steam käyttäjien tutkimiseen. Steam on maailman isoin pelien jakelualusta. Erityisesti projektissa tarkastellaan miten luotettava pelaaja on. Tämä tehdään keräämällä tietoa 
 pelaajien ystäväsuhteista, pelitiedoista yms. 
 
 Tietoa Steamista saa heidän APIn kautta: https://steamcommunity.com/dev
