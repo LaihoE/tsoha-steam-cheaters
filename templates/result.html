@@ -1,4 +1,19 @@
-<title>Etusivu</title>
-<h1>Etusivu</h1>
-<h1> {{ steam_hours }} </h1>
-
+<!DOCTYPE html>
+  
+<html>
+<head>
+    <title>Player stats</title>
+</head>
+<body>
+  
+<ol>
+<!-- For loop logic of jinja template -->
+{%for i in range(0, len)%}
+  
+    <li>{{data[i][0], data[i][1]}}</li>
+{%endfor%}
+  
+</ol>
+  
+</body>
+</html>

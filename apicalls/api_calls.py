@@ -73,20 +73,20 @@ def get_friends_list_from_id(steamid):
         return None
 
 
-def get_faceit_banned_and_skill_stats(steamid):
+def get_faceit_banned_and_skill_level(steamid):
     try:
         x = requests.get(f'https://api.faceit.com/search/v1/?limit=3&query={steamid}').json()
-        nickname = x['payload']['players']['results'][0]['nickname']
-        x = requests.get(f"https://open.faceit.com/data/v4/search/players?nickname={nickname}&offset=0&limit=20",
-                         headers={"Authorization": f"Bearer {faceit_key}"}).json()
-        status = bool(x['items'][0]['status'])
-        if status:
-            x = requests.get(f'https://api.faceit.com/sheriff/v1/bans/{nickname}')
-        verified = x['items'][0]['verified']
-        skill = x['items'][0]['games'][0]['skill_level']
-        return status, verified, skill
+        status = x['payload']['players']['results'][0]['status']
+        skill = x['payload']['players']['results'][0]['games'][0]['skill_level']
+
+        if status == 'BANNED':
+            status = True
+        else:
+            status = False
+
+        return status, skill
     except Exception as e:
-        return None
+        return None, None
 
 
 def get_faceit_ingame_stats(steamid):
@@ -193,19 +193,20 @@ class ThreadWithReturnValue(Thread):
         Thread.join(self, *args)
         return self._return
 
+def get_all_data(steamid):
+    
+    """
+    MAYBE ASYNC WOULD OF BEEN BETTER but oh well...
 
-def trust_checker(steamid):
-    output = []
-
-    # MAYBE ASYNC WOULD OF BEEN BETTER but oh well...
-
-    # Super ugly multithreading solution, couldn't really find anything clean.
-    # Cuts runtime by around 5x.
-    # Using a custom Threading class that allows return values.
-    # See: https://stackoverflow.com/questions/6893968/how-to-get-the-return-value-from-a-thread-in-python
-
+    Super ugly multithreading solution, couldn't really find anything clean.
+    Cuts runtime by around 5x.
+    Using a custom Threading class that allows return values.
+    See: https://stackoverflow.com/questions/6893968/how-to-get-the-return-value-from-a-thread-in-python
+    """
+    
+    output = {}
     t1 = ThreadWithReturnValue(target=get_inventory_value, args=(steamid,))
-    t2 = ThreadWithReturnValue(target=get_faceit_banned_and_skill_stats, args=(steamid,))
+    t2 = ThreadWithReturnValue(target=get_faceit_banned_and_skill_level, args=(steamid,))
     t3 = ThreadWithReturnValue(target=get_faceit_high_level_info, args=(steamid,))
     t4 = ThreadWithReturnValue(target=get_percentage_of_friends_banned, args=(steamid,))
     t5 = ThreadWithReturnValue(target=get_faceit_ingame_stats, args=(steamid,))
@@ -214,9 +215,30 @@ def trust_checker(steamid):
     t8 = ThreadWithReturnValue(target=get_total_number_of_games_steam, args=(steamid,))
 
     threads = [t1, t2, t3, t4, t5, t6, t7, t8]
+    temp_output = []
     for t in threads:
         t.start()
     for t in threads:
         # now the .join returns the value
-        output.append(t.join())
+        temp_output.append(t.join())
+
+    output["inv_value"] = 'tba' #temp_output[0]
+    output["faceit_ban"] = temp_output[1][0]
+    output["faceit_level"] = temp_output[1][1]
+
+    output["faceit_name"] = temp_output[2][0]
+    output["country_code"] = temp_output[2][1]
+    output["faceit_elo"] = temp_output[2][2]
+
+    output["percentage_friends_banned"] = temp_output[3]
+
+    output["kdr"] = temp_output[4][0]
+    output["total_matches_faceit"] = temp_output[4][1]
+    output["winrate"] = temp_output[4][2]
+    output["hs_ratio"] = temp_output[4][3]
+
+    output["hours_csgo"] = temp_output[5]
+    output["hours_total"] = temp_output[6]
+    output["total_games"] = temp_output[7]
+
     return output
