@@ -4,9 +4,16 @@ import requests
 from apicalls.api_calls import *
 from flask_sqlalchemy import SQLAlchemy
 import os
+import re
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+
+
+uri = os.getenv("DATABASE_URL")  # or other relevant config var
+if uri and uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = uri
 db = SQLAlchemy(app)
 
 
