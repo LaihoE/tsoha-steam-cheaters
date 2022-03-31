@@ -1,5 +1,9 @@
 # Tsoha harjoitustyö kevät 2022
 
+Heroku: https://steamcheaters.herokuapp.com/form  
+Voit esimerkiksi käyttää tätä testaamiseen: 76561197991348083
+
+
 Projektia käytetään steam käyttäjien tutkimiseen. Steam on maailman isoin pelien jakelualusta. Erityisesti projektissa tarkastellaan miten luotettava pelaaja on. Tämä tehdään keräämällä tietoa 
 pelaajien ystäväsuhteista, pelitiedoista yms. 
 
