@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import redirect ,render_template, request
 import requests
-from apicalls import *
+from apicalls.api_calls import *
 from flask_sqlalchemy import SQLAlchemy
 import os
 

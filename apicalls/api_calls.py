@@ -2,12 +2,13 @@ import math
 import os
 import time
 from threading import Thread
+import pandas as pd
 import requests
 import csv
 import pickle
 
-key = os.environ['steam_key']
-faceit_key = os.environ['faceit_key']
+key = os.environ['SteamKey']
+faceit_key = os.environ['FaceitKey']
 
 
 def convert_steamid_to_faceit_id(steamid):
@@ -24,7 +25,10 @@ def get_percentage_of_friends_banned(steamid):
         # Get all friends
         friends_list = []
         response = requests.get(
-            f"http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={key}&steamid={steamid}&relationship=friend").json()
+            f"http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={key}&steamid={steamid}&relationship=friend")
+        print(response)
+        response = response.json()
+
         all_friends = response['friendslist']['friends']
         for friend in all_friends:
             friends_list.append(int(friend['steamid']))
@@ -34,7 +38,9 @@ def get_percentage_of_friends_banned(steamid):
         for i in range(math.ceil(len(friends_list) / 100)):
             slice_of_ids = friends_list[i * 100: i * 100 + 100]
             response = requests.get(
-                f'https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key={key}&steamids={slice_of_ids}').json()
+                f'https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key={key}&steamids={slice_of_ids}')
+            print(response)
+            response = response.json()
             for player in response['players']:
                 sid = int(player["SteamId"])
                 vacbans = bool(player["VACBanned"])
@@ -50,15 +56,15 @@ def get_percentage_of_friends_banned(steamid):
         return None
 
 
-
-
 def get_friends_list_from_id(steamid):
     """
     Returns a list of ids: the users friends
     """
     try:
         friends_list = []
-        response = requests.get(f"http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={key}&steamid={steamid}&relationship=friend").json()
+        response = requests.get(f"http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key={key}&steamid={steamid}&relationship=friend")
+        print(response)
+        response = response.json()
         response_friends = response['friendslist']['friends']
         for friend in response_friends:
             friends_list.append(int(friend['steamid']))
@@ -73,7 +79,9 @@ def get_faceit_banned_and_skill_stats(steamid):
         nickname = x['payload']['players']['results'][0]['nickname']
         x = requests.get(f"https://open.faceit.com/data/v4/search/players?nickname={nickname}&offset=0&limit=20",
                          headers={"Authorization": f"Bearer {faceit_key}"}).json()
-        status = x['items'][0]['status']
+        status = bool(x['items'][0]['status'])
+        if status:
+            x = requests.get(f'https://api.faceit.com/sheriff/v1/bans/{nickname}')
         verified = x['items'][0]['verified']
         skill = x['items'][0]['games'][0]['skill_level']
         return status, verified, skill
@@ -129,6 +137,11 @@ def get_total_number_of_games_steam(steamid):
     except Exception as e:
         return None
 
+def get_account_creation_time(steamid):
+    data = requests.get(f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={key}&steamids={steamid}')
+    data = data.json()
+    return data['response']['players'][0]['timecreated']
+
 
 def get_faceit_high_level_info(steamid):
     try:
@@ -151,24 +164,20 @@ def get_inventory_value(steamid):
     # PLACEHOLDER SOLUTION
     with open('itemprices.pkl', "rb") as f:
         prices = pickle.load(f)
+    try:
+        item_list = []
+        data = requests.get(f'https://steamcommunity.com/inventory/{steamid}/730/2').json()
+        total_items = data["descriptions"]
+        for item in total_items:
+            item_list.append(item['market_hash_name'])
 
-    item_list = []
-    data = requests.get(f'https://steamcommunity.com/inventory/{steamid}/730/2').json()
-    total_items = data["descriptions"]
-    for item in total_items:
-        item_list.append(item['market_hash_name'])
+        for item in item_list:
+            if item in prices:
+                inventory_value += prices[item]
+        return inventory_value
+    except Exception as e:
+        print(e)
 
-    for item in item_list:
-        if item in prices:
-            inventory_value += prices[item]
-    return inventory_value
-
-
-def create_headers(path):
-    with open(f'{path}','w',newline='\n')as f:
-        thewriter = csv.writer(f)
-        thewriter.writerow(["vac","gameban","faceit_ban","faceit_level", "ban_percentage", "total_games", "steam_hours",
-                            "csgo_hours", "kdr", "total_matches", "winrate", "headshot_ratio"])
 
 # Custom Thread class with a return value
 class ThreadWithReturnValue(Thread):
@@ -185,21 +194,24 @@ class ThreadWithReturnValue(Thread):
         return self._return
 
 
-def trust_checker(sid):
+def trust_checker(steamid):
     output = []
+
+    # MAYBE ASYNC WOULD OF BEEN BETTER but oh well...
+
     # Super ugly multithreading solution, couldn't really find anything clean.
     # Cuts runtime by around 5x.
     # Using a custom Threading class that allows return values.
     # See: https://stackoverflow.com/questions/6893968/how-to-get-the-return-value-from-a-thread-in-python
 
-    t1 = ThreadWithReturnValue(target=get_inventory_value, args=(sid,))
-    t2 = ThreadWithReturnValue(target=get_faceit_banned_and_skill_stats, args=(sid,))
-    t3 = ThreadWithReturnValue(target=get_faceit_high_level_info, args=(sid,))
-    t4 = ThreadWithReturnValue(target=get_percentage_of_friends_banned, args=(sid,))
-    t5 = ThreadWithReturnValue(target=get_faceit_ingame_stats, args=(sid,))
-    t6 = ThreadWithReturnValue(target=get_total_hours_of_csgo, args=(sid,))
-    t7 = ThreadWithReturnValue(target=get_total_hours_on_steam, args=(sid,))
-    t8 = ThreadWithReturnValue(target=get_total_number_of_games_steam, args=(sid,))
+    t1 = ThreadWithReturnValue(target=get_inventory_value, args=(steamid,))
+    t2 = ThreadWithReturnValue(target=get_faceit_banned_and_skill_stats, args=(steamid,))
+    t3 = ThreadWithReturnValue(target=get_faceit_high_level_info, args=(steamid,))
+    t4 = ThreadWithReturnValue(target=get_percentage_of_friends_banned, args=(steamid,))
+    t5 = ThreadWithReturnValue(target=get_faceit_ingame_stats, args=(steamid,))
+    t6 = ThreadWithReturnValue(target=get_total_hours_of_csgo, args=(steamid,))
+    t7 = ThreadWithReturnValue(target=get_total_hours_on_steam, args=(steamid,))
+    t8 = ThreadWithReturnValue(target=get_total_number_of_games_steam, args=(steamid,))
 
     threads = [t1, t2, t3, t4, t5, t6, t7, t8]
     for t in threads:
@@ -208,10 +220,3 @@ def trust_checker(sid):
         # now the .join returns the value
         output.append(t.join())
     return output
-
-
-if __name__ == "__main__":
-    steamid = 0
-    b = time.time()
-    print(trust_checker(steamid))
-    print(time.time()-b)
