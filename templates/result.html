@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-  
+<style>
+    h1 {text-align: center;}
+    ol {text-align: center;}
+    div {text-align: center;}
+    p {text-align: center;}
+    
+    </style>
 <html>
 <head>
     <title>Player stats</title>
 </head>
 <body>
-  
-<ol>
-<!-- For loop logic of jinja template -->
-{%for i in range(0, len)%}
-  
-    <li>{{data[i][0], data[i][1]}}</li>
+ 
+{% for item, value in data.items(): %}
+    <p>{{item, value}}</p>
 {%endfor%}
-  
-</ol>
   
 </body>
 </html>
