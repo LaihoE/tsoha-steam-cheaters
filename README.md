@@ -4,6 +4,8 @@ Heroku: https://steamcheaters.herokuapp.com/form
 Voit esimerkiksi käyttää tätä testaamiseen: 76561197991348083
 
 
+
+
 Projektia käytetään steam käyttäjien tutkimiseen. Steam on maailman isoin pelien jakelualusta. Erityisesti projektissa tarkastellaan miten luotettava pelaaja on. Tämä tehdään keräämällä tietoa 
 pelaajien ystäväsuhteista, pelitiedoista yms. 
 
@@ -21,3 +23,12 @@ Esimerkkejä tietokannan tauluista:
 Hieman vastaava applikaatio on: https://faceitfinder.com/ voit esimerkiksi syöttää tämän steamidn: 76561197991348083
 
 Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
+
+
+##Todo
+- [x] Funktiot jotka hakevat datan API:sta
+- [x] Perus toiminnallisuus ilman tietokantaa
+- [ ] Funktiot jotka lähettävät datan tietokantaan
+- [ ] Funktiot jotka hakevat datan tietokannasta
+- [ ] Esteettisempi html
+- [ ] Login
