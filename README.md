@@ -32,3 +32,4 @@ Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
 - [ ] Funktiot jotka hakevat datan tietokannasta
 - [ ] Esteettisempi html
 - [ ] Login
+- [ ] Käyttäjä pystyy seuraamaan edellisiä hakujansa
