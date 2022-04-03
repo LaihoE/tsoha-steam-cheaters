@@ -25,7 +25,7 @@ Hieman vastaava applikaatio on: https://faceitfinder.com/ voit esimerkiksi syöt
 Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
 
 
-##Todo
+## Todo
 - [x] Funktiot jotka hakevat datan API:sta
 - [x] Perus toiminnallisuus ilman tietokantaa
 - [ ] Funktiot jotka lähettävät datan tietokantaan
