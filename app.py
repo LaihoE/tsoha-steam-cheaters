@@ -5,6 +5,7 @@ from apicalls.api_calls import get_all_data
 from flask_sqlalchemy import SQLAlchemy
 import os
 import re
+from db import *
 
 app = Flask(__name__)
 
@@ -24,13 +25,6 @@ def main():
 @app.route("/form")
 def form():
     return render_template("form.html")
-
-
-def get_friends(steamid):
-    sql = "SELECT user2 FROM friends WHERE user1 = (:steamid)"
-    result = db.session.execute(sql, {"steamid": steamid})
-    out = result.fetchall()
-    return out
 
 
 @app.route("/result", methods=["POST"])
