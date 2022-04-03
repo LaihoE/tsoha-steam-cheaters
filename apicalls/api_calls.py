@@ -20,6 +20,21 @@ def convert_steamid_to_faceit_id(steamid):
         return None
 
 
+def check_steam_ban(steamid):
+    response = requests.get(f'https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key={key}&steamids={steamid}')
+    print(response)
+    response = response.json()
+    print(response)
+    for player in response['players']:
+        sid = int(player["SteamId"])
+        vacbans = bool(player["VACBanned"])
+        gamebans = int(player["NumberOfGameBans"])
+        n_vacs = int(player["NumberOfVACBans"])
+        ban_days_ago = int(player["DaysSinceLastBan"])
+
+    return sid, vacbans, gamebans, n_vacs, ban_days_ago
+
+
 def get_percentage_of_friends_banned(steamid):
     try:
         # Get all friends
@@ -50,7 +65,7 @@ def get_percentage_of_friends_banned(steamid):
         # Sum all bans
         # If vac ban or game ban then True
         # List is of shape [(steamid, vacbanned, total_game_bans)...]
-        return sum([True if x[1] or x[2] > 0 else False for x in banned_friends_list]) / len(banned_friends_list)
+        return round(100 * sum([True if x[1] or x[2] > 0 else False for x in banned_friends_list]) / len(banned_friends_list),2)
 
     except Exception as e:
         return None
@@ -222,23 +237,22 @@ def get_all_data(steamid):
         # now the .join returns the value
         temp_output.append(t.join())
 
-    output["inv_value"] = 'tba' #temp_output[0]
-    output["faceit_ban"] = temp_output[1][0]
-    output["faceit_level"] = temp_output[1][1]
+    output["Inventory value"] = 'tba' #temp_output[0]
+    output["Banned on Faceit"] = temp_output[1][0]
+    output["Faceit level"] = temp_output[1][1]
 
-    output["faceit_name"] = temp_output[2][0]
-    output["country_code"] = temp_output[2][1]
-    output["faceit_elo"] = temp_output[2][2]
+    output["Name on Faceit"] = temp_output[2][0]
+    output["Country Code"] = temp_output[2][1]
+    output["Region"] = temp_output[2][2]
 
-    output["percentage_friends_banned"] = temp_output[3]
+    output["Friends banned percentage"] = temp_output[3]
 
-    output["kdr"] = temp_output[4][0]
-    output["total_matches_faceit"] = temp_output[4][1]
-    output["winrate"] = temp_output[4][2]
-    output["hs_ratio"] = temp_output[4][3]
+    output["KDR"] = temp_output[4][0]
+    output["Total matches on Faceit"] = temp_output[4][1]
+    output["Winrate"] = temp_output[4][2]
+    output["Headshot ratio"] = temp_output[4][3]
 
-    output["hours_csgo"] = temp_output[5]
-    output["hours_total"] = temp_output[6]
-    output["total_games"] = temp_output[7]
-
+    output["Hours of CSGO"] = temp_output[5]
+    output["Total hours on Steam"] = temp_output[6]
+    output["Total games on Steam"] = temp_output[7]
     return output

@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <style>
     h1 {text-align: center;}
-    ol {text-align: center;}
     div {text-align: center;}
-    p {text-align: center;}
-    
+    td {text-align: center;}
+    tr {text-align: center;}
+    td {text-align: center;}
     </style>
 <html>
 <head>
     <title>Player stats</title>
 </head>
 <body>
- 
-{% for item, value in data.items(): %}
-    <p>{{item, value}}</p>
-{%endfor%}
-  
+
+{% for key2,line_item in data.items() %}
+<tr>
+   <td class="col-md-2">{{key2}}:   {{ line_item }}<br></td>
+</tr>
+{% endfor %}
+
 </body>
 </html>
