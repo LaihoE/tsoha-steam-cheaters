@@ -7,6 +7,7 @@ import os
 import re
 from db import *
 
+
 app = Flask(__name__)
 
 
@@ -31,4 +32,7 @@ def form():
 def result():
     input_id = request.form["name"]
     data = get_all_data(input_id)
+    print(data)
+    insert_data(data, input_id)
+
     return render_template("result.html", data=data)

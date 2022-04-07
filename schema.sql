@@ -14,12 +14,12 @@ CREATE TABLE friends(
 CREATE TABLE faceitstats(
     steamid BIGINT PRIMARY KEY,
     faceit_level int,
-    faceit_name int,
+    faceit_name TEXT,
     country TEXT,
-    kdr float,
+    kdr decimal,
     n_matches int,
-    winrate float,
-    hs_ratio float
+    winrate decimal,
+    hs_ratio decimal
 );
 
 CREATE TABLE steamstats(
