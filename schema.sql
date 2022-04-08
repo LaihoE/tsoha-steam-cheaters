@@ -1,8 +1,9 @@
 CREATE TABLE bans(
-    steamid BIGINT PRIMARY KEY,
-    vacban BOOL,
-    steamban BOOL,
-    banned_days_ago int,
+    id SERIAL PRIMARY KEY,
+    steamid bigint,
+    vacban boolean,
+    steamban boolean,
+    banned_days_ago int
 );
 
 CREATE TABLE friends(
@@ -12,10 +13,12 @@ CREATE TABLE friends(
 );
 
 CREATE TABLE faceitstats(
-    steamid BIGINT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    steamid bigint,
+    created_at TIMESTAMPTZ DEFAULT Now(),
     faceit_level int,
-    faceit_name TEXT,
-    country TEXT,
+    faceit_name text,
+    country text,
     kdr decimal,
     n_matches int,
     winrate decimal,
@@ -23,7 +26,9 @@ CREATE TABLE faceitstats(
 );
 
 CREATE TABLE steamstats(
-    steamid BIGINT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    steamid bigint,
+    created_at TIMESTAMPTZ DEFAULT Now(),
     hours_csgo int,
     hours_steam int,
     total_games int

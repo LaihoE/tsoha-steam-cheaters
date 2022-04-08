@@ -28,8 +28,9 @@ Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
 ## Todo
 - [x] Funktiot jotka hakevat datan API:sta
 - [x] Perus toiminnallisuus ilman tietokantaa
-- [ ] Funktiot jotka lähettävät datan tietokantaan
+- [x] Funktiot jotka lähettävät datan tietokantaan
 - [ ] Funktiot jotka hakevat datan tietokannasta
 - [ ] Esteettisempi html
 - [ ] Login
 - [ ] Käyttäjä pystyy seuraamaan edellisiä hakujansa
+- [ ] Funktioille sopivammat nimet

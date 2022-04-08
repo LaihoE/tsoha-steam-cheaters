@@ -18,6 +18,15 @@ app.config["SQLALCHEMY_DATABASE_URI"] = uri
 db = SQLAlchemy(app)
 
 
+
+def get_friends(steamid):
+    sql = "SELECT user2 FROM friends WHERE user1 = (:steamid)"
+    result = db.session.execute(sql, {"steamid": steamid})
+    out = result.fetchall()
+    return out
+
+
+
 def insert_friends(input_id, friends_list):
     for friend in friends_list:
         sql = "INSERT INTO FRIENDS (user1, user2) VALUES (:user1, :user2)"
@@ -25,13 +34,25 @@ def insert_friends(input_id, friends_list):
     db.session.commit()
 
 
-def insert_bans(steamid, vacban, steamban, banned_days_ago):
-    sql = "INSERT INTO bans (steamid, vacban, steamban, banned_days_ago) VALUES (:steamid, :vacban, :steamban, :banned_days_ago)"
-    db.session.execute(sql, {"steamid": steamid,
-                             "vacban":vacban,
-                             "steamban":steamban,
-                             "banned_days_ago":banned_days_ago})
+def insert_friends_bans(data, steamid):
+    """
+    inserts 
+    """
+
+    for friend in data['Friends banned list']:
+
+        steamid = friend[0]
+        vacban = friend[1]
+        gamebans = True if friend[2] > 1 else False
+        days_banned_ago = friend[3]
+
+        sql = "INSERT INTO bans (steamid, vacban, steamban, banned_days_ago) VALUES (:steamid, :vacban, :steamban, :banned_days_ago)"
+        db.session.execute(sql, {"steamid": steamid,
+                                "vacban":vacban,
+                                "steamban":gamebans,
+                                "banned_days_ago":days_banned_ago})
     db.session.commit()
+
 
 def insert_faceit_stats(data, steamid):
     faceit_level = data["Faceit level"]
@@ -73,20 +94,34 @@ def insert_steam_stats(data, steamid):
     db.session.commit()
     
 
-def get_friends(steamid):
-    sql = "SELECT user2 FROM friends WHERE user1 = (:steamid)"
-    result = db.session.execute(sql, {"steamid": steamid})
-    out = result.fetchall()
-    return out
+
+
+
+def insert_last_lookup(steamid):
+    sql = """INSERT INTO lastlookup (steamid, hours_csgo, hours_steam, total_games)
+             VALUES (:steamid, :hours_csgo, :hours_steam, :total_games)"""
+    
+    db.session.execute(sql, {"steamid": steamid,
+                             "hours_csgo":hours_csgo,
+                             "hours_steam": hours_steam,
+                             "total_games": total_games
+                             })
+    db.session.commit()
+
+
 
 
 def insert_data(data, steamid):
     """
     Main function that calls insert functions
     """
-    insert_faceit_stats(data, steamid)
+    # Creates a table with last time that ID was looked up
+    #insert_last_lookup(steamid)
+    insert_friends_bans(data, steamid)
     insert_steam_stats(data, steamid)
+    insert_faceit_stats(data, steamid)
+    
 
 
 if __name__ == "__main__":
-    insert_bans(76561198112024117, True, False, 12)
+    insert_friends_bans(76561198112024117, True, False, 12)
