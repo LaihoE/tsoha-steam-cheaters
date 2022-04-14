@@ -31,8 +31,10 @@ def form():
 @app.route("/result", methods=["POST"])
 def result():
     input_id = request.form["name"]
-    data = get_all_data(input_id)
-    print(data)
-    insert_data(data, input_id)
-
-    return render_template("result.html", data=data)
+    api_data = get_all_data(input_id)
+    insert_data(api_data, input_id)
+    
+    banned_friends, faceit_data, steam_data = fetch_from_db(input_id)
+    return render_template("result.html",banned_friends=banned_friends,
+                                    faceit_data=faceit_data,
+                                    steam_data=steam_data)

@@ -19,18 +19,84 @@ db = SQLAlchemy(app)
 
 
 
-def get_friends(steamid):
-    sql = "SELECT user2 FROM friends WHERE user1 = (:steamid)"
+
+def insert_data(data, steamid):
+    """
+    Main function that calls insert functions
+    """
+    insert_friends(data, steamid)
+    insert_friends_bans(data, steamid)
+    insert_steam_stats(data, steamid)
+    insert_faceit_stats(data, steamid)
+
+ 
+def fetch_from_db(steamid):
+    friends = get_banned_friends(steamid)
+    faceit_stats = get_faceit_stats(steamid)
+    steam_stats = get_steam_stats(steamid)
+    return friends, faceit_stats, steam_stats
+
+
+def get_banned_friends(steamid):
+    # Lets also use dict for consistency with other fetch methods, list would be more natural
+    data_dict = {}
+    sql = """
+            SELECT DISTINCT friends.user2, bans.vacban, bans.steamban, bans.banned_days_ago 
+            FROM friends, bans
+            WHERE friends.user2=bans.steamid
+                AND friends.user1=:steamid
+                AND (bans.vacban=True OR bans.steamban=True)
+          """
     result = db.session.execute(sql, {"steamid": steamid})
     out = result.fetchall()
-    return out
+    banned_friends_list = [friend for friend in out]
+    data_dict["banned_friends"] = banned_friends_list
+    return data_dict
+
+def get_faceit_stats(steamid):
+    data_dict = {}
+    sql = """
+          SELECT faceit_level, faceit_name, country, kdr, n_matches, winrate, hs_ratio
+          FROM faceitstats
+          WHERE steamid = :steamid
+          ORDER BY created_at
+          LIMIT 1;
+          """
+    result = db.session.execute(sql, {"steamid": steamid})
+    out = result.fetchall()[0]
+    print("OUT", out)
+    data_dict["faceit_level"] = out[0]
+    data_dict["faceit_name"] = out[1]
+    data_dict["country"] = out[2]
+    data_dict["kdr"] = out[3]
+    data_dict["n_matches"] = out[4]
+    data_dict["winrate"] = out[5]
+    data_dict["hs_ratio"] = out[6]
+    return data_dict
 
 
+def get_steam_stats(steamid):
+    data_dict = {}
+    sql = """
+          SELECT hours_csgo, hours_steam, total_games
+          FROM steamstats
+          WHERE steamid = :steamid
+          ORDER BY created_at
+          LIMIT 1;
+          """
+    result = db.session.execute(sql, {"steamid": steamid})
+    out = result.fetchall()[0]
+    data_dict["hours_csgo"] = out[0]
+    data_dict["hours_steam"] = out[1]
+    data_dict["total_games"] = out[2]
+    return data_dict
 
-def insert_friends(input_id, friends_list):
-    for friend in friends_list:
+
+def insert_friends(data, steamid):
+    for friend in data['Friends banned list']:
+        friend_id = friend[0]
         sql = "INSERT INTO FRIENDS (user1, user2) VALUES (:user1, :user2)"
-        db.session.execute(sql, {"user1": input_id, "user2":friend})
+        db.session.execute(sql, {"user1": steamid, "user2":friend_id})
     db.session.commit()
 
 
@@ -94,9 +160,6 @@ def insert_steam_stats(data, steamid):
     db.session.commit()
     
 
-
-
-
 def insert_last_lookup(steamid):
     sql = """INSERT INTO lastlookup (steamid, hours_csgo, hours_steam, total_games)
              VALUES (:steamid, :hours_csgo, :hours_steam, :total_games)"""
@@ -107,20 +170,6 @@ def insert_last_lookup(steamid):
                              "total_games": total_games
                              })
     db.session.commit()
-
-
-
-
-def insert_data(data, steamid):
-    """
-    Main function that calls insert functions
-    """
-    # Creates a table with last time that ID was looked up
-    #insert_last_lookup(steamid)
-    insert_friends_bans(data, steamid)
-    insert_steam_stats(data, steamid)
-    insert_faceit_stats(data, steamid)
-    
 
 
 if __name__ == "__main__":

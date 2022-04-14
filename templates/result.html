@@ -12,7 +12,19 @@
 </head>
 <body>
 
-{% for key2,line_item in data.items() %}
+{% for key2,line_item in banned_friends.items() %}
+<tr>
+   <td class="col-md-2">{{key2}}:   {{ line_item }}<br></td>
+</tr>
+{% endfor %}
+
+{% for key2,line_item in faceit_data.items() %}
+<tr>
+   <td class="col-md-2">{{key2}}:   {{ line_item }}<br></td>
+</tr>
+{% endfor %}
+
+{% for key2,line_item in steam_data.items() %}
 <tr>
    <td class="col-md-2">{{key2}}:   {{ line_item }}<br></td>
 </tr>
