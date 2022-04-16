@@ -1,34 +1,56 @@
 <!DOCTYPE html>
 <style>
-    h1 {text-align: center;}
-    div {text-align: center;}
-    td {text-align: center;}
-    tr {text-align: center;}
-    td {text-align: center;}
-    </style>
+div.friends {
+    white-space: nowrap;
+    width: 50%;
+    font-size: 70%;
+    text-align: left; 
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+#parent { white-space: nowrap; }
+.child { display: inline-block; }
+
+div.stats {
+    white-space: nowrap;
+    width: 50%;
+    font-size: 100%;
+    text-align: left; 
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+</style>
 <html>
 <head>
     <title>Player stats</title>
 </head>
 <body>
+<h1>{{stats["Steam name"]}}</h1>    
+<div class="stats">
+    <table>
+        <thead>
+        </thead>
+        <tbody>
+        {% for key, value in stats.items() %}
+         <tr>
+             <td> {{ key }} </td>
+             <td> {{ value }} </td>
+         </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+</div>
+<div class="friends">
+    <h3>Friends Banned</h3>
+    <h3>{{n_friends_banned}} / {{n_friends_total[0][0]}} ({{banned_percentage}})</h3>
+    {% for table in friends_table %}
+        {{friends_titles[loop.index]}}
+        {{ table|safe }}
+    {% endfor %}
+    </div>
 
-{% for key2,line_item in banned_friends.items() %}
-<tr>
-   <td class="col-md-2">{{key2}}:   {{ line_item }}<br></td>
-</tr>
-{% endfor %}
-
-{% for key2,line_item in faceit_data.items() %}
-<tr>
-   <td class="col-md-2">{{key2}}:   {{ line_item }}<br></td>
-</tr>
-{% endfor %}
-
-{% for key2,line_item in steam_data.items() %}
-<tr>
-   <td class="col-md-2">{{key2}}:   {{ line_item }}<br></td>
-</tr>
-{% endfor %}
+<form action="/">
+    <input type="submit" value="Back to search" />
+</form>
 
 </body>
 </html>

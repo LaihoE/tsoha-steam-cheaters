@@ -31,11 +31,10 @@ def check_steam_ban(steamid):
         gamebans = int(player["NumberOfGameBans"])
         n_vacs = int(player["NumberOfVACBans"])
         ban_days_ago = int(player["DaysSinceLastBan"])
-
     return sid, vacbans, gamebans, n_vacs, ban_days_ago
 
 
-def get_percentage_of_friends_banned(steamid):
+def get_friends_banned_list(steamid):
     try:
         # Get all friends
         friends_list = []
@@ -56,16 +55,16 @@ def get_percentage_of_friends_banned(steamid):
                 f'https://api.steampowered.com/ISteamUser/GetPlayerBans/v1/?key={key}&steamids={slice_of_ids}')
             print(response)
             response = response.json()
+
             for player in response['players']:
                 sid = int(player["SteamId"])
                 vacbans = bool(player["VACBanned"])
                 gamebans = int(player["NumberOfGameBans"])
-                banned_friends_list.append((sid, vacbans, gamebans))
+                days_ago = int(player["DaysSinceLastBan"])
+                banned_friends_list.append((sid, vacbans, gamebans, days_ago))
 
-        # Sum all bans
-        # If vac ban or game ban then True
-        # List is of shape [(steamid, vacbanned, total_game_bans)...]
-        return round(100 * sum([True if x[1] or x[2] > 0 else False for x in banned_friends_list]) / len(banned_friends_list),2)
+        # List is of shape [(steamid, vacbanned, total_game_bans, days_ago)...]
+        return banned_friends_list
 
     except Exception as e:
         return None
@@ -93,8 +92,8 @@ def get_faceit_banned_and_skill_level(steamid):
         x = requests.get(f'https://api.faceit.com/search/v1/?limit=3&query={steamid}').json()
         status = x['payload']['players']['results'][0]['status']
         skill = x['payload']['players']['results'][0]['games'][0]['skill_level']
-
-        if status == 'BANNED':
+        print(x)
+        if status == 'banned':
             status = True
         else:
             status = False
@@ -174,24 +173,13 @@ def get_faceit_high_level_info(steamid):
         return None
 
 def get_inventory_value(steamid):
-    inventory_value = 0
+    # API limits, over 10k unique items etc. 
+    # Placeholder but probably won't be implemented
+    return 0
 
-    # PLACEHOLDER SOLUTION
-    with open('itemprices.pkl', "rb") as f:
-        prices = pickle.load(f)
-    try:
-        item_list = []
-        data = requests.get(f'https://steamcommunity.com/inventory/{steamid}/730/2').json()
-        total_items = data["descriptions"]
-        for item in total_items:
-            item_list.append(item['market_hash_name'])
-
-        for item in item_list:
-            if item in prices:
-                inventory_value += prices[item]
-        return inventory_value
-    except Exception as e:
-        print(e)
+def get_steam_name(steamid):
+    data = requests.get(f'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key={key}&steamids={steamid}').json()
+    return data['response']['players'][0]['personaname']
 
 
 # Custom Thread class with a return value
@@ -208,11 +196,14 @@ class ThreadWithReturnValue(Thread):
         Thread.join(self, *args)
         return self._return
 
-def get_all_data(steamid):
+
+def get_api_data(steamid):
     
     """
-    MAYBE ASYNC WOULD OF BEEN BETTER but oh well...
+    Returns a dictionary with all the api data
 
+
+    MAYBE ASYNC WOULD OF BEEN BETTER but oh well...
     Super ugly multithreading solution, couldn't really find anything clean.
     Cuts runtime by around 5x.
     Using a custom Threading class that allows return values.
@@ -223,13 +214,17 @@ def get_all_data(steamid):
     t1 = ThreadWithReturnValue(target=get_inventory_value, args=(steamid,))
     t2 = ThreadWithReturnValue(target=get_faceit_banned_and_skill_level, args=(steamid,))
     t3 = ThreadWithReturnValue(target=get_faceit_high_level_info, args=(steamid,))
-    t4 = ThreadWithReturnValue(target=get_percentage_of_friends_banned, args=(steamid,))
+    t4 = ThreadWithReturnValue(target=get_friends_banned_list, args=(steamid,))
     t5 = ThreadWithReturnValue(target=get_faceit_ingame_stats, args=(steamid,))
     t6 = ThreadWithReturnValue(target=get_total_hours_of_csgo, args=(steamid,))
     t7 = ThreadWithReturnValue(target=get_total_hours_on_steam, args=(steamid,))
     t8 = ThreadWithReturnValue(target=get_total_number_of_games_steam, args=(steamid,))
 
-    threads = [t1, t2, t3, t4, t5, t6, t7, t8]
+    t9 = ThreadWithReturnValue(target=check_steam_ban, args=(steamid,))
+    t10 = ThreadWithReturnValue(target=get_steam_name, args=(steamid,))
+
+
+    threads = [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10] 
     temp_output = []
     for t in threads:
         t.start()
@@ -237,7 +232,6 @@ def get_all_data(steamid):
         # now the .join returns the value
         temp_output.append(t.join())
 
-    output["Inventory value"] = 'tba' #temp_output[0]
     output["Banned on Faceit"] = temp_output[1][0]
     output["Faceit level"] = temp_output[1][1]
 
@@ -245,7 +239,7 @@ def get_all_data(steamid):
     output["Country Code"] = temp_output[2][1]
     output["Region"] = temp_output[2][2]
 
-    output["Friends banned percentage"] = temp_output[3]
+    output["Friends banned list"] = temp_output[3]
 
     output["KDR"] = temp_output[4][0]
     output["Total matches on Faceit"] = temp_output[4][1]
@@ -255,4 +249,14 @@ def get_all_data(steamid):
     output["Hours of CSGO"] = temp_output[5]
     output["Total hours on Steam"] = temp_output[6]
     output["Total games on Steam"] = temp_output[7]
+
+    output["gamebans"] = temp_output[8][2]
+    output["n_vacs"] = temp_output[8][3]
+    output["ban_days_ago"] = temp_output[8][4]
+
+    output["steam_name"] = temp_output[9]
+
+
+    #sid, vacbans, gamebans, n_vacs, ban_days_ago
+
     return output
