@@ -29,8 +29,7 @@ Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
 - [x] Funktiot jotka hakevat datan API:sta
 - [x] Perus toiminnallisuus ilman tietokantaa
 - [x] Funktiot jotka lähettävät datan tietokantaan
-- [ ] Funktiot jotka hakevat datan tietokannasta
-- [ ] Esteettisempi html
+- [x] Funktiot jotka hakevat datan tietokannasta
+- [x] Esteettisempi html, (noh hieman paremi...)
 - [ ] Login
 - [ ] Käyttäjä pystyy seuraamaan edellisiä hakujansa
-- [ ] Funktioille sopivammat nimet
