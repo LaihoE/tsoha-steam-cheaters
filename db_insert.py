@@ -104,7 +104,7 @@ def insert_steam_stats(data, steamid):
     
     db.session.execute(sql, {"steamid": steamid,
                             "steam_name": steam_name,
-                             "hours_csgo":hours_csgo,
+                             "hours_csgo": hours_csgo,
                              "hours_steam": hours_steam,
                              "total_games": total_games
                              })

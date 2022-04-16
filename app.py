@@ -46,7 +46,6 @@ def result():
     n_friends_total = banned_friends_data[1]
     n_friends_banned =  banned_friends_data[2]
     banned_percentage=f"{(round(n_friends_banned / n_friends_total[0][0] * 100, 2))} %"
-
     return render_template("result.html",
                         banned_percentage=banned_percentage,
                         n_friends_total=n_friends_total,
