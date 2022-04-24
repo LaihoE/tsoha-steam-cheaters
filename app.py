@@ -21,8 +21,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = uri
 db = SQLAlchemy(app)
 
 
-@app.route("/")
-@app.route("/form")
+@app.route("/", methods=["GET", "POST"])
+@app.route("/form", methods=["GET", "POST"])
 def form():
     return render_template("form.html")
 
@@ -40,6 +40,7 @@ def login():
             return redirect("/")
         else:
             return render_template("login.html", error="Incorrect login!")
+
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
@@ -70,17 +71,23 @@ def login_landing():
     return redirect("/login")
 
 
-@app.route("/result", methods=["POST"])
-def result():
+@app.route("/submit_id", methods=["POST", "GET"])
+def submit_id():
+    print("HEHREHERHER")
     input_id = request.form["name"]
     ok = check_input(input_id)
+    print(ok)
     if not ok:
-        return redirect("/incorrect_id")
-    
-    #Data
+        return render_template("form.html", error='Invalid ID')
     api_data = get_api_data(input_id)
     insert_to_db(api_data, input_id)
-    banned_user_data, banned_friends_data, faceit_data, steam_data = fetch_from_db(input_id)
+    return redirect(f"/result{input_id}")
+
+
+@app.route("/result<steamid>", methods=["GET"])
+def result(steamid):
+    #Data
+    banned_user_data, banned_friends_data, faceit_data, steam_data = fetch_from_db(steamid)
 
     # Combine faceit_data and steam_data
     banned_user_data.update(faceit_data)
