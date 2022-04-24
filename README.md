@@ -32,7 +32,8 @@ Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
 - [x] Funktiot jotka lähettävät datan tietokantaan
 - [x] Funktiot jotka hakevat datan tietokannasta
 - [x] Esteettisempi html, (noh hieman paremi...)
-- [ ] Tarkistaa että ID on toimiva
+- [x] Tarkistaa että ID on toimiva
+- [x] Login
+- [x] redirectaa onnistuneen haun
 - [ ] Friends banned antaa joskus väärän määrän
-- [ ] Login
 - [ ] Käyttäjä pystyy seuraamaan edellisiä hakujansa
