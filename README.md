@@ -1,7 +1,8 @@
 # Tsoha harjoitustyö kevät 2022
 
 Heroku: https://steamcheaters.herokuapp.com/form  
-Voit esimerkiksi käyttää tätä testaamiseen: 76561197991348083
+Voit esimerkiksi käyttää tätä testaamiseen: 76561197991348083  
+
 
 
 
@@ -31,5 +32,7 @@ Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
 - [x] Funktiot jotka lähettävät datan tietokantaan
 - [x] Funktiot jotka hakevat datan tietokannasta
 - [x] Esteettisempi html, (noh hieman paremi...)
+- [ ] Tarkistaa että ID on toimiva
+- [ ] Friends banned antaa joskus väärän määrän
 - [ ] Login
 - [ ] Käyttäjä pystyy seuraamaan edellisiä hakujansa
