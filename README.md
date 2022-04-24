@@ -3,7 +3,8 @@
 Heroku: https://steamcheaters.herokuapp.com/form  
 Voit esimerkiksi käyttää tätä testaamiseen: 76561197991348083  
 
-
+##### Kommentti 24.7
+- Register ja login toimivat mutta eivät sen kummemmin tee mitään!  
 
 
 
