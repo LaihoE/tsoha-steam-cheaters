@@ -1,3 +1,13 @@
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username TEXT,
+    password TEXT);
+
+
+
+
+
+
 CREATE TABLE bans(
     id SERIAL PRIMARY KEY,
     created_at TIMESTAMPTZ DEFAULT Now(),
@@ -7,7 +17,6 @@ CREATE TABLE bans(
     faceitban boolean,
     banned_days_ago int
 );
-
 
 CREATE TABLE friends(
     id SERIAL PRIMARY KEY,

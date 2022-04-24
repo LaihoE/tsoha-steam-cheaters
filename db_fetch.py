@@ -25,6 +25,7 @@ def fetch_from_db(steamid):
     user_bans = get_user_bans(steamid)
     return user_bans, friends, faceit_stats, steam_stats
 
+
 def get_user_bans(steamid):
     data_dict = {}
     sql = """
@@ -53,6 +54,7 @@ def get_banned_friends(steamid):
           """
     result = db.session.execute(sql, {"steamid": steamid})
     out = result.fetchall()
+    n_banned_friends = len(out)
 
     data_dict["ID"] = []
     data_dict["Vacban"] = []
@@ -71,10 +73,9 @@ def get_banned_friends(steamid):
             WHERE friends.user1=:steamid
         """
     result = db.session.execute(sql, {"steamid": steamid})
-    # Lets also get number of friends and number of banned
     total_firends = result.fetchall()
-    banned_friends = len(data_dict)
-    return data_dict, total_firends, banned_friends
+
+    return data_dict, total_firends, n_banned_friends
 
 def get_faceit_stats(steamid):
     data_dict = {}
@@ -124,5 +125,4 @@ def get_steam_stats(steamid):
         data_dict["Hours of CSGO"] = data_list[1]
         data_dict["Hours Total on Steam"] = data_list[2]
         data_dict["Total number of games"] = data_list[3]
-    print("XD", data_dict)
     return data_dict

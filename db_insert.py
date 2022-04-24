@@ -14,7 +14,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = uri
 db = SQLAlchemy(app)
 
 
-def insert_data(data, steamid):
+def insert_to_db(data, steamid):
     """
     Main function that calls smaller insert functions
     """
