@@ -3,9 +3,11 @@
 Heroku: https://steamcheaters.herokuapp.com/form  
 Voit esimerkiksi käyttää tätä testaamiseen: 76561197991348083  
 
-##### Kommentti 24.7
-- Register ja login toimivat mutta eivät sen kummemmin tee mitään!  
 
+Asioita jotka jäivät tekemättä ajanpuutteen takia:
+- Käyttäjille toimintaa (tällä hetkellä voit vain luoda käyttäjän ja kirjautua sisään)
+- Nätimpi ulkoasu
+- Joitain pieniä bugeja
 
 
 Projektia käytetään steam käyttäjien tutkimiseen. Steam on maailman isoin pelien jakelualusta. Erityisesti projektissa tarkastellaan miten luotettava pelaaja on. Tämä tehdään keräämällä tietoa 
@@ -36,5 +38,4 @@ Projekti on aputyökalu isommalle projektille: https://github.com/LaihoE/DLAC
 - [x] Tarkistaa että ID on toimiva
 - [x] Login
 - [x] redirectaa onnistuneen haun
-- [ ] Friends banned antaa joskus väärän määrän
 - [ ] Käyttäjä pystyy seuraamaan edellisiä hakujansa
