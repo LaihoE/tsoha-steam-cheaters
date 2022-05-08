@@ -2,17 +2,8 @@ from apicalls.api_calls import *
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
-
-
-app = Flask(__name__)
-
-
-uri = os.getenv("DATABASE_URL")
-if uri and uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
-
-app.config["SQLALCHEMY_DATABASE_URI"] = uri
-db = SQLAlchemy(app)
+from app import app
+from db import db
 
 
 def fetch_from_db(steamid):

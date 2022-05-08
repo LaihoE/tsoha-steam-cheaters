@@ -4,19 +4,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import redirect ,render_template, request, session
+from app import app
+from db import db
 
-
-
-app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")
-
-
-uri = os.getenv("DATABASE_URL")
-if uri and uri.startswith("postgres://"):
-    uri = uri.replace("postgres://", "postgresql://", 1)
-
-app.config["SQLALCHEMY_DATABASE_URI"] = uri
-db = SQLAlchemy(app)
 
 
 
@@ -39,10 +29,14 @@ def dict_to_html_df(d, single_row=False):
 
 def check_register(username, password):
     if username is None or password is None:
-        return [False, "Username or password is empty"]
-
+        return [False, "Username or password is empty."]
+    
     if len(username) > 30 or len(password) > 30:
-        return [False, "Password is too long"]
+        return [False, "Username or password is too long (max 30)"]
+    
+    if len(username) == 0 or len(password) == 0:
+        return [False, "Username or password is empty."]
+
 
     sql = "SELECT id FROM users WHERE username=:username"
     result = db.session.execute(sql, {"username":username})
@@ -51,7 +45,6 @@ def check_register(username, password):
        return [False, "Username already exists"] 
 
     return [True, "ok"]
-
 
 
 def check_login(username, password):
